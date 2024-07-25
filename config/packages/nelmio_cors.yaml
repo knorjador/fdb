@@ -1,0 +1,30 @@
+nelmio_cors:
+  defaults:
+    # origin_regex: true
+    # allow_origin: ['%env(CORS_ALLOW_ORIGIN)%']
+    # allow_methods: ['GET', 'OPTIONS', 'POST', 'PUT', 'PATCH', 'DELETE']
+    # allow_headers: ['Content-Type', 'Authorization']
+    # expose_headers: ['Link']
+    # max_age: 3600
+    allow_credentials: true
+    allow_origin: ['*']
+    allow_methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+    allow_headers: ['Content-Type', 'Authorization', 'X-CSRF-Token']
+    max_age: 3600
+  paths:
+    # '^/': null
+    '^/':  # Applique les règles à toutes les routes
+      allow_origin: ['*'] # Exemple d'origine autorisée
+      allow_headers: ['Content-Type', 'Authorization', 'X-CSRF-Token']
+      allow_methods: ['GET', 'POST', 'OPTIONS']
+      allow_credentials: true
+      max_age: 3600
+      expose_headers: ['X-Custom-Header']
+      hosts: ['api.example.com']
+      origin_regex: false
+      skip_same_as_origin: false
+    '^/api/': 
+      # allow_origin: ['*']
+      allow_origin: ['*']
+      allow_headers: ['Content-Type', 'Authorization', 'X-CSRF-Token']
+      allow_methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
