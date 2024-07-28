@@ -23,7 +23,7 @@ nelmio_cors:
       hosts: ['api.example.com']
       origin_regex: false
       skip_same_as_origin: false
-    '^/api/': 
+    '^/auth/': 
       # allow_origin: ['*']
       allow_origin: ['*']
       allow_headers: ['Content-Type', 'Authorization', 'X-CSRF-Token']
