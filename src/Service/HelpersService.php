@@ -4,15 +4,20 @@ namespace App\Service;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Request;
-// ---- SERVICES ----
 use App\Service\RegexService;
 
 class HelpersService
 {
 
     private LoggerInterface $logger;
-    private $regexService;
+    private RegexService $regexService;
 
+    /**
+     * Constructor HelpersService
+     *
+     * @param LoggerInterface $logger
+     * @param RegexService $regexService
+    */
     public function __construct(
         LoggerInterface $logger,
         RegexService $regexService
@@ -21,6 +26,13 @@ class HelpersService
         $this->regexService = $regexService;
     }
 
+    /**
+     * Checks and processes received data from the request based on the HTTP method
+     *
+     * @param Request $request
+     * @param array $args
+     * @return array|string An array of checked parameters if valid, otherwise a string with the key of the invalid parameter
+    */
     public function checkReceived(Request $request, array $args): array|string
     {
         $regexes = $this->regexService->getRegexes();
@@ -37,26 +49,6 @@ class HelpersService
         }
 
         // $this->logger->info('received', ['received' => $received]);
-
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('received', ['received' => $received]);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('args', ['args' => $args]);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
-        $this->logger->info('ok', ['ok' => '']);
 
         foreach ($args as $arg) {
             if (

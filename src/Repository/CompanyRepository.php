@@ -13,25 +13,23 @@ use App\Entity\Company;
 */
 class CompanyRepository extends ServiceEntityRepository
 {
-    
-    private LoggerInterface $logger;
 
     /**
-     * CompanyRepository constructor
+     * Constructor CompanyRepository
      *
      * @param ManagerRegistry $registry The ManagerRegistry instance
     */
-    public function __construct(ManagerRegistry $registry, LoggerInterface $logger)
+    public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Company::class);
-        $this->logger = $logger;
     }
 
     /**
-     * Persists and flushes a Company entity
+     * Save a new company associated with a user
      *
-     * @param Company $company The company entity to save
-     * @return bool True if the company was saved successfully, false otherwise
+     * @param User $user
+     * @param array $data
+     * @return Company|bool The saved company or false on failure
     */
     public function save(User $user, array $data): Company|bool
     {
@@ -59,11 +57,11 @@ class CompanyRepository extends ServiceEntityRepository
     }
 
     /**
-     * Check if there is a company with the given SIRET associated with the given User
+     * Check if there is a company with the given SIRET associated with the given user
      *
      * @param User $user
      * @param string $siret
-     * @return bool
+     * @return Company|bool The found company or false on failure
     */
     public function existsCompanyForUser(User $user, string $siret): Company|bool
     {
@@ -90,11 +88,11 @@ class CompanyRepository extends ServiceEntityRepository
     }
 
     /**
-     * Update a Company entity associated with the given User
+     * Update a company associated with a user
      *
-     * @param User $user The user who owns the company
-     * @param array $data The data to update the company
-     * @return Company|bool Company if the company was updated successfully, false otherwise
+     * @param User $user
+     * @param array $data
+     * @return array An array containing the update status and the updated company
     */
     public function update(User $user, array $data): array
     {
@@ -144,11 +142,11 @@ class CompanyRepository extends ServiceEntityRepository
     }
 
     /**
-     * Deletes a Company entity by its SIRET and associated User
+     * Delete a company associated with a user by SIRET
      *
-     * @param string $siret The SIRET number of the company
-     * @param User $user The user who owns the company
-     * @return bool True if the company was deleted, false otherwise
+     * @param User $user
+     * @param string $siret
+     * @return Company|bool The deleted company or false on failure
     */
     public function deleteCompanyBySiret(User $user, string $siret): Company|bool
     {

@@ -30,6 +30,17 @@ class ApiController extends AbstractController
     private AuthService $authService;
     private InseeApiService $inseeApiService;
 
+    /**
+     * Constructor ApiController
+     *
+     * @param LoggerInterface $logger
+     * @param EntityManagerInterface $entityManager
+     * @param UserRepository $userRepository
+     * @param CompanyRepository $companyRepository
+     * @param HelpersService $helpersService
+     * @param AuthService $authService
+     * @param InseeApiService $inseeApiService
+    */
     public function __construct(
         LoggerInterface $logger,
         EntityManagerInterface $entityManager,
@@ -49,6 +60,11 @@ class ApiController extends AbstractController
         $this->inseeApiService = $inseeApiService;    
     }
 
+    /**
+     * Check if the API is up with method POST
+     *
+     * @return JsonResponse
+    */
     #[Route('/api/company/up', name: 'api_up', methods: ['POST'])]
     public function up(): JsonResponse
     {
@@ -61,6 +77,12 @@ class ApiController extends AbstractController
         }
     }
 
+    /**
+     * Create a new company with method POST
+     *
+     * @param Request $request
+     * @return JsonResponse
+    */
     #[Route('/api/company/create', name: 'api_company_create', methods: ['POST'])]
     public function createCompany(Request $request): JsonResponse
     {
@@ -98,6 +120,12 @@ class ApiController extends AbstractController
         return new JsonResponse(['response' => $response], $checkedRequest['status']);  
     }
 
+    /**
+     * Read companies with method GET
+     *
+     * @param Request $request
+     * @return JsonResponse
+    */
     #[Route('/api/company/read', name: 'api_company_read', methods: ['GET'])]
     public function readCompanies(Request $request): JsonResponse
     {
@@ -126,6 +154,12 @@ class ApiController extends AbstractController
         return $response;
     }
 
+    /**
+     * Update a company with method PUT
+     *
+     * @param Request $request
+     * @return JsonResponse
+    */
     #[Route('/api/company/update', name: 'api_company_update', methods: ['PUT'])]
     public function updateCompany(Request $request): JsonResponse
     {
@@ -153,6 +187,13 @@ class ApiController extends AbstractController
         return new JsonResponse(['response' => $response], $checkedRequest['status']);
     }
 
+    /**
+     * Delete a company with method DELETE
+     *
+     * @param Request $request
+     * @param string $siret
+     * @return JsonResponse
+    */
     #[Route('/api/company/delete/{siret}', name: 'api_company_delete', methods: ['DELETE'])]
     public function deleteCompany(Request $request, string $siret): JsonResponse
     {
@@ -174,6 +215,13 @@ class ApiController extends AbstractController
         return new JsonResponse(['response' => $response], $checkedRequest['status']);     
     }
 
+    /**
+     * Check the request authentification
+     *
+     * @param Request $request
+     * @param array|bool $received
+     * @return array
+    */
     private function checkRequest(Request $request, array|bool $received): array
     {
         $checkedRequest = ['status' => Response::HTTP_UNAUTHORIZED];
@@ -207,6 +255,12 @@ class ApiController extends AbstractController
         return $checkedRequest;
     }
 
+    /**
+     * Build the payload sended to front end
+     *
+     * @param array $params
+     * @return array
+    */
     private function buildPayload(array $params): array
     {
         $payload = [];

@@ -9,6 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+// ---- DB ---- 
 use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
 
@@ -19,22 +20,37 @@ use App\Entity\User;
 class AppCommandManageUserCommand extends Command
 {
 
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
+    /**
+     * Constructor
+     *
+     * @param EntityManagerInterface $entityManager
+    */
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
         parent::__construct();
     }
 
+    /**
+     * Configure the command
+    */
     protected function configure(): void
     {
         $this
             ->addArgument('email', InputArgument::OPTIONAL, 'Email of the user')
-            ->addOption('action', null, InputOption::VALUE_REQUIRED, 'Action to perform (add or remove)', 'add')
+            ->addOption('action', null, InputOption::VALUE_REQUIRED, 'Action to perform (add, list, remove)', 'add')
         ;
     }
 
+    /**
+     * Execute the command
+     *
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+    */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
@@ -58,7 +74,7 @@ class AppCommandManageUserCommand extends Command
         } elseif ($action === 'list') {
             $this->listUsers($output);
         } else {
-            $output->writeln('Invalid action. Use "add" or "remove"');
+            $output->writeln('Invalid action. Use "add" or "list" or "remove"');
             return Command::FAILURE;
         }
 
@@ -70,6 +86,11 @@ class AppCommandManageUserCommand extends Command
         return Command::SUCCESS;
     }
 
+    /**
+     * Add an user
+     *
+     * @param string $email
+    */
     private function addUser(string $email): void
     {
         $user = new User();
@@ -81,12 +102,18 @@ class AppCommandManageUserCommand extends Command
         $this->entityManager->flush();
     }
 
+    /**
+     * Remove a user
+     *
+     * @param string $email
+     * @param OutputInterface $output
+    */
     private function removeUser(string $email, OutputInterface $output): void
     {
         $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $email]);
 
         if (!$user) {
-            $output->writeln('User not found.');
+            $output->writeln('User not found');
             return;
         }
 
@@ -94,12 +121,17 @@ class AppCommandManageUserCommand extends Command
         $this->entityManager->flush();
     }
 
+    /**
+     * List users
+     *
+     * @param OutputInterface $output
+    */
     private function listUsers(OutputInterface $output): void
     {
         $users = $this->entityManager->getRepository(User::class)->findAll();
 
         if (empty($users)) {
-            $output->writeln('No users found.');
+            $output->writeln('No users found');
             return;
         }
 
@@ -109,6 +141,12 @@ class AppCommandManageUserCommand extends Command
         }
     }
 
+    /**
+     * Generate a hex auth token
+     *
+     * @param int $length
+     * @return string
+    */
     private function generateHexAuthToken(int $length = 32): string
     {
         return bin2hex(openssl_random_pseudo_bytes($length));

@@ -8,13 +8,23 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 class RequestLoggerListener
 {
 
-    private $logger;
+    private LoggerInterface $logger;
 
+    /**
+     * Constructor ApiController RequestLoggerListener
+     *
+     * @param LoggerInterface $logger The logger interface
+    */
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
 
+    /**
+     * Logs the request details if the application is in development mode
+     *
+     * @param RequestEvent $event The request event
+    */
     public function onKernelRequest(RequestEvent $event)
     {
         if ($_ENV['APP_ENV'] === 'dev') {

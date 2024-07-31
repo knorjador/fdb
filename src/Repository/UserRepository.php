@@ -11,16 +11,34 @@ use Doctrine\Persistence\ManagerRegistry;
 */
 class UserRepository extends ServiceEntityRepository
 {
+
+    /**
+     * Constructor UserRepository
+     *
+     * @param ManagerRegistry $registry The ManagerRegistry instance
+    */
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
     }
 
+    /**
+     * Finds a user by email
+     *
+     * @param string $email
+     * @return User|null The user found, or null if no user was found
+    */
     public function findOneByEmail(string $email): ?User
     {
         return $this->findOneBy(['email' => $email]);
     }
 
+    /**
+     * Finds the companies associated with a user
+     *
+     * @param User
+     * @return array The array of companies associated with the user
+    */
     public function findUserCompanies(User $user): array
     {
         try {

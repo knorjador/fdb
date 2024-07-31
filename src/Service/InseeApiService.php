@@ -23,24 +23,36 @@ https://www.sirene.fr/static-resources/htm/codes_retour_311.html
 
 */
 
+/**
+ * Service for interacting with the INSEE API
+*/
 class InseeApiService
 {
 
     const BASE_URL = 'https://api.insee.fr/';
     const API_VERSION = 'V3.11';
 
-    private $httpClient;
-    private $cache;
-    private $pubKey;
-    private $privateKey;
     private LoggerInterface $logger;
+    private HttpClientInterface $httpClient;
+    private FilesystemAdapter $cache;
+    private string $pubKey;
+    private string $privateKey;
 
+    /**
+     * Constructor InseeApiService
+     *
+     * @param LoggerInterface $logger
+     * @param HttpClientInterface $httpClient
+     * @param FilesystemAdapter $cache
+     * @param string $pubKey
+     * @param string $privateKey
+    */
     public function __construct(
+        LoggerInterface $logger,
         HttpClientInterface $httpClient,
         FilesystemAdapter $cache,
         string $pubKey, 
-        string $privateKey,
-        LoggerInterface $logger
+        string $privateKey
     ) {
         $this->httpClient = $httpClient;
         $this->cache = $cache;
@@ -49,16 +61,33 @@ class InseeApiService
         $this->logger = $logger;
     }
 
+    /**
+     * Gets the URL for obtaining the bearer token
+     *
+     * @return string The URL to get the bearer token
+    */
     public static function tokenUrl(): string
     {
         return self::BASE_URL . 'token';
     }
 
+    /**
+     * Gets the URL for fetching company data by SIRET
+     *
+     * @return string The URL to fetch company data by SIRET
+    */
     public static function siretUrl(): string
     {
         return self::BASE_URL . 'entreprises/sirene/' . self::API_VERSION . '/siret/';
     }
 
+    /**
+     * Retrieves the bearer token, either from the cache or by making a request to the API
+     *
+     * @return string The bearer token
+     *
+     * @throws \RuntimeException If unable to fetch the bearer token
+    */
     public function getBearer(): string
     {
         return $this->cache->get('insee_api_bearer', function (ItemInterface $item) {
@@ -86,6 +115,13 @@ class InseeApiService
         });
     }
 
+    /**
+     * Fetches company data by SIRET from the INSEE API
+     *
+     * @param string $siret
+     *
+     * @return array An array containing the status code and company data or error details
+    */
     public function getCompanyData(string $siret): array
     {
         try {
@@ -141,6 +177,14 @@ class InseeApiService
         }
     }
 
+    /**
+     * Formats the company data retrieved from the INSEE API
+     *
+     * @param string $siret
+     * @param array $company
+     *
+     * @return array An array containing the formatted company data
+    */
     private function formatCompany(string $siret, array $company): array
     {
         $name = '';

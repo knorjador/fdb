@@ -25,6 +25,14 @@ class AuthController extends AbstractController
     private HelpersService $helpersService;
     private AuthService $authService;
 
+    /**
+     * Constructor AuthController
+     *
+     * @param LoggerInterface $logger
+     * @param UserRepository $userRepository
+     * @param HelpersService $helpersService
+     * @param AuthService $authService
+    */
     public function __construct(
         LoggerInterface $logger,
         UserRepository $userRepository,
@@ -38,6 +46,13 @@ class AuthController extends AbstractController
         $this->authService = $authService;
     }
 
+    /**
+     * Check if the user is authenticated based on cookies
+     * with method POST 
+     * 
+     * @param Request $request
+     * @return JsonResponse
+    */
     #[Route('/auth/check', name: 'auth_check', methods: ['POST'])]
     public function check(Request $request): JsonResponse
     {
@@ -55,6 +70,13 @@ class AuthController extends AbstractController
         return new JsonResponse($response, Response::HTTP_OK);
     }
 
+    /**
+     * Handle user login && generate authentication cookies
+     * with method POST
+     *
+     * @param Request $request
+     * @return JsonResponse
+    */
     #[Route('/auth/login', name: 'auth_login', methods: ['POST'])]
     public function login(Request $request): JsonResponse
     {
@@ -75,6 +97,13 @@ class AuthController extends AbstractController
         return new JsonResponse($response, Response::HTTP_OK, $cookies);
     }
 
+    /**
+     * Handle user logout and clear authentication cookies
+     * with method POST
+     *
+     * @param Request $request
+     * @return JsonResponse
+    */
     #[Route('/auth/logout', name: 'auth_logout', methods: ['POST'])]
     public function logout(Request $request): JsonResponse
     {

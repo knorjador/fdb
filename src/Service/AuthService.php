@@ -19,6 +19,13 @@ class AuthService
     private $jwtManager;
     private $cryptoService;
 
+    /**
+     * Constructor AuthService
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param JWTTokenManagerInterface $jwtManager
+     * @param CryptoService $cryptoService
+    */
     public function __construct(
         EntityManagerInterface $entityManager,
         JWTTokenManagerInterface $jwtManager,
@@ -29,6 +36,12 @@ class AuthService
         $this->cryptoService = $cryptoService;
     }
 
+    /**
+     * Make an array of cookies for the given user
+     *
+     * @param User $user
+     * @return array An array of cookies
+    */
     public function makeCookies(User $user): array
     {
         $bearer = $this->jwtManager->create($user);
@@ -45,6 +58,12 @@ class AuthService
         ];
     }
 
+    /**
+     * Checks the cookies from the request for authentication
+     *
+     * @param Request $request
+     * @return bool|array False if cookies are invalid or not present, otherwise an array with email && checkAuth
+    */
     public function checkCookies(Request $request): bool|array
     {
         $bearer = $request->cookies->get('bearer');
@@ -77,11 +96,14 @@ class AuthService
         return false;
     }
 
-    public function generateCheckAuth(int $length = 32): string
-    {
-        return bin2hex(openssl_random_pseudo_bytes($length));
-    }
-
+    /**
+     * Make a cookie with the given parameters
+     *
+     * @param string $name
+     * @param string $value
+     * @param string $expiration
+     * @return string The cookie string
+    */
     private function makeCookie(string $name, string $value, string $expiration): string
     {
         return new Cookie(

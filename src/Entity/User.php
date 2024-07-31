@@ -101,15 +101,6 @@ class User implements UserInterface
     }
 
     /**
-     * @see UserInterface
-    */
-    public function eraseCredentials(): void
-    {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword = null;
-    }
-
-    /**
      * @return Collection<int, Company>
     */
     public function getCompanies(): Collection
