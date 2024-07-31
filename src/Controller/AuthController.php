@@ -10,7 +10,10 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 // ---- PACKAGES ----
+use OpenApi\Attributes as OA;
+use Nelmio\ApiDocBundle\Annotation\Model;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+
 // ---- DB ----
 use App\Repository\UserRepository;
 // ---- SERVICES ----
@@ -46,9 +49,40 @@ class AuthController extends AbstractController
         $this->authService = $authService;
     }
 
+
+    #[OA\Tag(name: 'User')]
+    #[OA\CookieParameter(
+        name: 'bearer',
+        description: 'Bearer JWT token for authentication',
+        required: true
+    )]
+    #[OA\CookieParameter(
+        name: 'auth',
+        description: 'Token for authentication',
+        required: true
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Check if user is authenticated',
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(
+                    property: 'response',
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'authenticated',
+                            type: 'boolean',
+                            example: true
+                        )
+                    ]
+                )
+            ]
+        )
+    )]
     /**
      * Check if the user is authenticated based on cookies
-     * with method POST 
      * 
      * @param Request $request
      * @return JsonResponse
@@ -70,9 +104,50 @@ class AuthController extends AbstractController
         return new JsonResponse($response, Response::HTTP_OK);
     }
 
+    #[OA\Tag(name: 'User')]
+    #[OA\RequestBody(
+        description: 'Login the user',
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(
+                    property: 'email',
+                    type: 'string',
+                    description: 'Email of the user',
+                    example: 'hello@frommy.email'
+                )
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Login successful',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'response',
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'authenticated',
+                            type: 'boolean',
+                            example: true
+                        )
+                    ]
+                )
+            ]
+        ),
+        headers: [
+            new OA\Header(
+                header: 'Set-Cookie',
+                description: 'Authentication cookies',
+                schema: new OA\Schema(type: 'string')
+            )
+        ]
+    )]
     /**
      * Handle user login && generate authentication cookies
-     * with method POST
      *
      * @param Request $request
      * @return JsonResponse
@@ -97,9 +172,28 @@ class AuthController extends AbstractController
         return new JsonResponse($response, Response::HTTP_OK, $cookies);
     }
 
+    #[OA\Tag(name: 'User')]
+    #[OA\Response(
+        response: 200,
+        description: 'Logout successful',
+        content: new OA\JsonContent(
+            properties: [
+                new OA\Property(
+                    property: 'response',
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'authenticated',
+                            type: 'boolean',
+                            example: false
+                        )
+                    ]
+                )
+            ]
+        )
+    )]
     /**
      * Handle user logout and clear authentication cookies
-     * with method POST
      *
      * @param Request $request
      * @return JsonResponse

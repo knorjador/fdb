@@ -9,6 +9,9 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+// ---- PACKAGES ----
+use OpenApi\Attributes as OA;
+use Nelmio\ApiDocBundle\Annotation\Model;
 // ---- DB ----
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UserRepository;
@@ -60,8 +63,30 @@ class ApiController extends AbstractController
         $this->inseeApiService = $inseeApiService;    
     }
 
+
+    #[OA\Tag(name: 'Company')]
+    #[OA\Response(
+        response: 200,
+        description: 'API is available',
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(
+                    property: 'response',
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'up',
+                            type: 'boolean',
+                            example: true
+                        )
+                    ]
+                )
+            ]
+        )
+    )]
     /**
-     * Check if the API is up with method POST
+     * Check if the API is available
      *
      * @return JsonResponse
     */
@@ -77,8 +102,71 @@ class ApiController extends AbstractController
         }
     }
 
+
+    #[OA\Tag(name: 'Company')]
+    #[OA\CookieParameter(
+        name: 'bearer',
+        description: 'Bearer JWT token for authentication',
+        required: true
+    )]
+    #[OA\CookieParameter(
+        name: 'auth',
+        description: 'Token for authentication',
+        required: true
+    )]
+    #[OA\RequestBody(
+        description: 'Company data to be created',
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(
+                    property: 'siret',
+                    type: 'string',
+                    description: 'SIRET number of the company',
+                    example: '12345678900001'
+                )
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Company successfully created or if the company already exists',
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(
+                    property: 'response',
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'payload',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(
+                                    property: 'severity',
+                                    type: 'string',
+                                    example: 'success'
+                                ),
+                                new OA\Property(
+                                    property: 'summary',
+                                    type: 'string',
+                                    example: 'Création'
+                                ),
+                                new OA\Property(
+                                    property: 'detail',
+                                    type: 'string',
+                                    example: 'Company data was created successfully'
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
+    )]
     /**
-     * Create a new company with method POST
+     * Create a new company
      *
      * @param Request $request
      * @return JsonResponse
@@ -120,8 +208,74 @@ class ApiController extends AbstractController
         return new JsonResponse(['response' => $response], $checkedRequest['status']);  
     }
 
+
+    #[OA\Tag(name: 'Company')]
+    #[OA\CookieParameter(
+        name: 'bearer',
+        description: 'Bearer JWT token for authentication',
+        required: true
+    )]
+    #[OA\CookieParameter(
+        name: 'auth',
+        description: 'Token for authentication',
+        required: true
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'List of user\'s companies or redirect if authentication fails',
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(
+                    property: 'response',
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'companies',
+                            type: 'array',
+                            items: new OA\Items(
+                                type: 'object',
+                                properties: [
+                                    new OA\Property(
+                                        property: 'siret',
+                                        type: 'string',
+                                        example: '12345678900001'
+                                    ),
+                                    new OA\Property(
+                                        property: 'siren',
+                                        type: 'string',
+                                        example: '123456789'
+                                    ),
+                                    new OA\Property(
+                                        property: 'name',
+                                        type: 'string',
+                                        example: 'Company Name'
+                                    ),
+                                    new OA\Property(
+                                        property: 'address',
+                                        type: 'string',
+                                        example: '1234 Street Name'
+                                    ),
+                                    new OA\Property(
+                                        property: 'tva',
+                                        type: 'string',
+                                        example: 'FR123456789'
+                                    )
+                                ]
+                            )
+                        ),
+                        new OA\Property(
+                            property: 'redirect',
+                            type: 'boolean',
+                            example: false
+                        )
+                    ]
+                )
+            ]
+        )
+    )]
     /**
-     * Read companies with method GET
+     * Read companies for an user
      *
      * @param Request $request
      * @return JsonResponse
@@ -154,8 +308,94 @@ class ApiController extends AbstractController
         return $response;
     }
 
+    #[OA\Tag(name: 'Company')]
+    #[OA\CookieParameter(
+        name: 'bearer',
+        description: 'Bearer JWT token for authentication',
+        required: true
+    )]
+    #[OA\CookieParameter(
+        name: 'auth',
+        description: 'Token for authentication',
+        required: true
+    )]
+    #[OA\RequestBody(
+        description: 'Company data to be updated',
+        required: true,
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(
+                    property: 'siret',
+                    type: 'string',
+                    description: 'SIRET number of the company',
+                    example: '12345678900001'
+                ),
+                new OA\Property(
+                    property: 'siren',
+                    type: 'string',
+                    description: 'SIREN number of the company',
+                    example: '123456789'
+                ),
+                new OA\Property(
+                    property: 'name',
+                    type: 'string',
+                    description: 'Name of the company',
+                    example: 'New Name'
+                ),
+                new OA\Property(
+                    property: 'address',
+                    type: 'string',
+                    description: 'Address of the company',
+                    example: 'New Address'
+                ),
+                new OA\Property(
+                    property: 'tva',
+                    type: 'string',
+                    description: 'VAT number of the company',
+                    example: 'New TVA'
+                )
+            ]
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Company successfully updated',
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(
+                    property: 'response',
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'payload',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(
+                                    property: 'severity',
+                                    type: 'string',
+                                    example: 'success'
+                                ),
+                                new OA\Property(
+                                    property: 'summary',
+                                    type: 'string',
+                                    example: 'Modification'
+                                ),
+                                new OA\Property(
+                                    property: 'detail',
+                                    type: 'string',
+                                    example: 'Company data was updated successfully'
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
+    )]
     /**
-     * Update a company with method PUT
+     * Update a company
      *
      * @param Request $request
      * @return JsonResponse
@@ -187,8 +427,65 @@ class ApiController extends AbstractController
         return new JsonResponse(['response' => $response], $checkedRequest['status']);
     }
 
+    #[OA\Tag(name: 'Company')]
+    #[OA\CookieParameter(
+        name: 'bearer',
+        description: 'Bearer JWT token for authentication',
+        required: true
+    )]
+    #[OA\CookieParameter(
+        name: 'auth',
+        description: 'Token for authentication',
+        required: true
+    )]
+    #[OA\Parameter(
+        name: 'siret',
+        in: 'path',
+        required: true,
+        description: 'SIRET number of the company to be deleted',
+        schema: new OA\Schema(
+            type: 'string',
+            example: '12345678900001'
+        )
+    )]
+    #[OA\Response(
+        response: 200,
+        description: 'Company successfully deleted',
+        content: new OA\JsonContent(
+            type: 'object',
+            properties: [
+                new OA\Property(
+                    property: 'response',
+                    type: 'object',
+                    properties: [
+                        new OA\Property(
+                            property: 'payload',
+                            type: 'object',
+                            properties: [
+                                new OA\Property(
+                                    property: 'severity',
+                                    type: 'string',
+                                    example: 'success'
+                                ),
+                                new OA\Property(
+                                    property: 'summary',
+                                    type: 'string',
+                                    example: 'Suppression'
+                                ),
+                                new OA\Property(
+                                    property: 'detail',
+                                    type: 'string',
+                                    example: 'Company data was deleted successfully'
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
+    )]
     /**
-     * Delete a company with method DELETE
+     * Delete a company
      *
      * @param Request $request
      * @param string $siret
@@ -250,6 +547,7 @@ class ApiController extends AbstractController
             }
         } else {
             $checkedRequest['fail'] = true;
+            $checkedRequest['payload'] = [];
         }
 
         return $checkedRequest;
