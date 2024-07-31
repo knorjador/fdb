@@ -48,8 +48,6 @@ class HelpersService
             }
         }
 
-        // $this->logger->info('received', ['received' => $received]);
-
         foreach ($args as $arg) {
             if (
                 !isset($received[$arg]) ||

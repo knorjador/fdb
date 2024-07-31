@@ -105,9 +105,6 @@ class InseeApiService
                 $data = $response->toArray();
                 $item->expiresAfter($data['expires_in'] - 60);
 
-                $this->logger->info('insee_api_bearer', ['insee_api_bearer' => $data['access_token']]);
-                $this->logger->info('expires_in', ['expires_in' => $data['expires_in']]);
-
                 return $data['access_token'];
             }
 
