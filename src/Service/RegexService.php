@@ -5,7 +5,7 @@ namespace App\Service;
 class RegexService
 {
 
-    private const COMPANY = '/^[a-zA-Z0-9\s]{1,255}$/';
+    private const COMPANY = '/^[a-zA-Z0-9\s]{0,255}$/';
 
     private const REGEXES = [
         'email' => '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/',
