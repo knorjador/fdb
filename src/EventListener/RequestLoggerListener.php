@@ -7,6 +7,7 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 
 class RequestLoggerListener
 {
+
     private $logger;
 
     public function __construct(LoggerInterface $logger)
@@ -24,9 +25,9 @@ class RequestLoggerListener
 
             $this->logger->info('Headers: ' . PHP_EOL . $headers);
             $this->logger->info('Cookies: ' . PHP_EOL . $cookies);
-            $this->logger->info('Body: ', $body);
-            // $this->logger->info('CSRF Token:', [$request->headers->get('x-csrf-token')] ?? []);
+            $this->logger->info('Body: ', $body ?? []);
         }
     }
+    
 }
 

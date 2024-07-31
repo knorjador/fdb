@@ -4,6 +4,7 @@ namespace App\Service;
 
 class CryptoService
 {
+    
     private $key;
     private $cipherMethod = 'aes-256-cbc';
 
@@ -34,5 +35,6 @@ class CryptoService
 
         return $decrypted;
     }
+
 }
 

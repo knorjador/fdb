@@ -9,47 +9,33 @@ use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Doctrine\ORM\EntityManagerInterface;
+// ---- PACKAGES ----
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
-use App\Entity\User;
+// ---- DB ----
+use App\Repository\UserRepository;
+// ---- SERVICES ----
+use App\Service\HelpersService;
 use App\Service\AuthService;
 
 class AuthController extends AbstractController
 {
 
-    private $entityManager;
-    private $authService;
     private LoggerInterface $logger;
+    private UserRepository $userRepository;
+    private HelpersService $helpersService;
+    private AuthService $authService;
 
     public function __construct(
-        EntityManagerInterface $entityManager, 
-        AuthService $authService,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        UserRepository $userRepository,
+        HelpersService $helpersService,
+        AuthService $authService
     )
     {
-        $this->entityManager = $entityManager;
-        $this->authService = $authService;
         $this->logger = $logger;
-    }
-
-    #[Route('/auth/login', name: 'auth_login', methods: ['POST'])]
-    public function login(Request $request): JsonResponse
-    {
-        $response = ['response' => ['authenticated' => false]];
-        $cookies = [];
-        $received = json_decode($request->getContent(), true);
-        $user = $this->entityManager->getRepository(User::class)->findOneBy(['email' => $received['email']]);
-
-        if ($user) {
-            $makedCookies = $this->authService->makeCookies($user);
-
-            // $this->logger->info('makedCookies', ['makedCookies' => $makedCookies]);
-
-            $response['response']['authenticated'] = true;
-            $cookies = ['Set-Cookie' => $makedCookies];
-        }
-
-        return new JsonResponse($response, Response::HTTP_OK, $cookies);
+        $this->userRepository = $userRepository;
+        $this->helpersService = $helpersService;
+        $this->authService = $authService;
     }
 
     #[Route('/auth/check', name: 'auth_check', methods: ['POST'])]
@@ -59,9 +45,7 @@ class AuthController extends AbstractController
         $checkedCookies = $this->authService->checkCookies($request);
 
         if ($checkedCookies !== false) {
-            $user = $this->entityManager
-                ->getRepository(User::class)
-                ->findOneBy(['email' => $checkedCookies['email']]);
+            $user = $this->userRepository->findOneByEmail($checkedCookies['email']);
 
             if ($user && $user->getCheckAuth() === $checkedCookies['auth']) {
                 $response['response'] = ['authenticated' => true, 'email' => $checkedCookies['email']];
@@ -69,6 +53,26 @@ class AuthController extends AbstractController
         }
 
         return new JsonResponse($response, Response::HTTP_OK);
+    }
+
+    #[Route('/auth/login', name: 'auth_login', methods: ['POST'])]
+    public function login(Request $request): JsonResponse
+    {
+        $response = ['response' => ['authenticated' => false]];
+        $cookies = [];
+        $received = $this->helpersService->checkReceived($request, ['email']);
+
+        if ($received !== false) {
+            $user = $this->userRepository->findOneByEmail($received['email']);
+
+            if ($user) {    
+                $makedCookies = $this->authService->makeCookies($user);
+                $response['response']['authenticated'] = true;
+                $cookies = ['Set-Cookie' => $makedCookies];
+            }
+        }
+
+        return new JsonResponse($response, Response::HTTP_OK, $cookies);
     }
 
     #[Route('/auth/logout', name: 'auth_logout', methods: ['POST'])]

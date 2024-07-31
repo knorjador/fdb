@@ -34,3 +34,10 @@ services:
         arguments:
             $key: '%env(resolve:COOKIE_ENCRYPTION_KEY)%'
 
+    App\Service\InseeApiService:
+        arguments:
+            $httpClient: '@http_client'
+            $cache: '@cache.app'
+            $pubKey: '%env(resolve:INSEE_PUB_KEY)%'
+            $privateKey: '%env(resolve:INSEE_PRIVATE_KEY)%'
+

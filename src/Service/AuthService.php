@@ -4,13 +4,17 @@ namespace App\Service;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Cookie;
-use Doctrine\ORM\EntityManagerInterface;
+// ---- PACKAGES ----
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+// ---- DB ----
+use Doctrine\ORM\EntityManagerInterface;
 use App\Entity\User;
+// ---- SERVICES ----
 use App\Service\CryptoService;
 
 class AuthService
 {
+
     private $entityManager;
     private $jwtManager;
     private $cryptoService;
@@ -73,6 +77,11 @@ class AuthService
         return false;
     }
 
+    public function generateCheckAuth(int $length = 32): string
+    {
+        return bin2hex(openssl_random_pseudo_bytes($length));
+    }
+
     private function makeCookie(string $name, string $value, string $expiration): string
     {
         return new Cookie(
@@ -86,4 +95,5 @@ class AuthService
             Cookie::SAMESITE_STRICT // SameSite
         );
     }
+    
 }

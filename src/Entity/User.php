@@ -28,7 +28,7 @@ class User implements UserInterface
 
     /**
      * @var Collection<int, Company>
-     */
+    */
     #[ORM\ManyToMany(targetEntity: Company::class, mappedBy: 'user')]
     private Collection $companies;
 

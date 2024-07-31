@@ -12,6 +12,11 @@ framework:
 
     #esi: true
     #fragments: true
+    
+    http_client:
+        scoped_clients:
+            insee_api:
+                base_uri: 'https://api.insee.fr/'
 
 when@test:
     framework:
