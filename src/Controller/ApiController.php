@@ -107,12 +107,14 @@ class ApiController extends AbstractController
     #[OA\CookieParameter(
         name: 'bearer',
         description: 'Bearer JWT token for authentication',
-        required: true
+        required: true,
+        allowEmptyValue: true
     )]
     #[OA\CookieParameter(
         name: 'auth',
         description: 'Token for authentication',
-        required: true
+        required: true,
+        allowEmptyValue: true
     )]
     #[OA\RequestBody(
         description: 'Company data to be created',
